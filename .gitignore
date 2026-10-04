@@ -1,0 +1,6 @@
+.venv/
+.gmhome/
+.repos/
+.meta-agent/
+checkpoints/*.pt
+analysis/_e4_*.json
