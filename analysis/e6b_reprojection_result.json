@@ -1,0 +1,10 @@
+{
+ "n_windows": 680,
+ "base_mean": 0.3397548198699951,
+ "reproj_mean": 0.34686776995658875,
+ "drop": -0.0209355391561985,
+ "noVel_mean": 0.34801286458969116,
+ "stance_base": 0.3507660925388336,
+ "stance_reproj": 0.3593418300151825,
+ "verdict": "OTHER SOURCE (stall-A slip mechanism NOT confirmed)"
+}

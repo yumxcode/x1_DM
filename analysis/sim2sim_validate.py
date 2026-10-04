@@ -229,6 +229,15 @@ class X1Sim:
             if mg:
                 self.gear[i] = float(mg.group(1))
 
+    def override_pd_from_xml(self, pd_xml_path, pd_scale=1.0):
+        """Replace kp/kd(/gear) tables with those parsed from another MJCF
+        (e.g. old-line x1_v4.xml gains) — for cross-line policy evaluation.
+        Also rewrites model.dof_damping in place so the implicit damping
+        matches the source xml."""
+        self._parse_pd(pd_xml_path, pd_scale)
+        for i in range(29):
+            self.model.dof_damping[self.joint_dofadr[i]] = self.kd[i]
+
     def qpos2dof(self):
         return self.data.qpos[self.joint_qposadr]
 
@@ -308,6 +317,16 @@ def main():
     ap.add_argument("--friction", type=float, default=1.0,
                     help="ground/foot tangential friction scale (E4 layer 1: "
                          "0.6/0.8/1.0/1.2 sweep per idear-0006 I21 protocol)")
+    ap.add_argument("--pd-xml", default=None,
+                    help="override kp/kd/gear tables (and model damping) from "
+                         "another MJCF, e.g. old-line x1_v4.xml")
+    ap.add_argument("--render", action="store_true",
+                    help="render rollout to mp4 (X1 mesh via x1_render_sim.xml; "
+                         "falls back to plain xml when mesh file unavailable)")
+    ap.add_argument("--render-xml", default=os.path.join(
+                        os.path.dirname(os.path.abspath(__file__)), "x1_render_sim.xml"))
+    ap.add_argument("--video-out", default=None,
+                    help="mp4 path (default: alongside --out, or ./sim2sim.mp4)")
     ap.add_argument("--init", choices=["rsi", "home"], default="rsi",
                     help="episode init: motion frame (RSI, training-aligned) "
                          "or home pose (transient-pollution control arm)")
@@ -317,10 +336,28 @@ def main():
     args = ap.parse_args()
 
     sim = X1Sim(args.xml, pd_scale=args.pd_scale)
+    if args.pd_xml:
+        sim.override_pd_from_xml(args.pd_xml)
     if args.friction != 1.0:
         # scale tangential friction of all geoms (ground + feet capsules)
         sim.model.geom_friction[:, 0] *= args.friction
     dt_ctrl = 1.0 / 30.0
+
+    renderer = None
+    video_out = args.video_out
+    if args.render:
+        import mujoco as _mj
+        rmodel = _mj.MjModel.from_xml_path(args.render_xml)
+        rdata = _mj.MjData(rmodel)
+        renderer = _mj.Renderer(rmodel, height=480, width=854)
+        cam = _mj.MjvCamera()
+        cam.lookat[:] = [0.0, 0.0, 0.7]
+        cam.distance = 3.2
+        cam.elevation = -12
+        if video_out is None:
+            video_out = (args.out or "sim2sim").replace(".json", "") + ".mp4"
+        _vdir = os.path.dirname(os.path.abspath(video_out))
+        os.makedirs(_vdir, exist_ok=True)
     n_phys = int(round(dt_ctrl / sim.model.opt.timestep))
 
     policy = load_policy(args.policy)  # returns callable obs->action (rad)
@@ -332,6 +369,7 @@ def main():
     pipe = deque(maxlen=n_delay + 1) if n_delay > 0 else None
 
     results = []
+    render_frames = []
     for ep in range(args.episodes):
         if args.init == "rsi":
             rp, rq, qd = rsi_init_state(args.init_clip, args.init_frame,
@@ -366,6 +404,12 @@ def main():
                                sole_zmin=zmin.copy(),
                                sole_c=[centers[0].copy(), centers[1].copy()],
                                tau_last=sim.data.ctrl.copy()))
+            if renderer is not None:
+                rdata.qpos[:] = sim.data.qpos
+                rdata.qvel[:] = sim.data.qvel
+                _mj.mj_forward(rmodel, rdata)
+                renderer.update_scene(rdata, camera=cam)
+                render_frames.append(renderer.render())
         results.append(analyze_episode(frames, done, t))
         print(f"episode {ep}: dur={t:.2f}s fell={done} "
               f"v_fwd={results[-1]['fwd_vel_mean']:.2f} duty_L={results[-1]['duty_L']:.2f}")
@@ -374,6 +418,16 @@ def main():
         with open(args.out, "w") as f:
             json.dump(results, f, indent=2)
         print("saved", args.out)
+
+    if renderer is not None and render_frames:
+        import cv2
+        h, w = render_frames[0].shape[:2]
+        vw = cv2.VideoWriter(video_out, cv2.VideoWriter_fourcc(*"mp4v"), 30, (w, h))
+        for fr in render_frames:
+            vw.write(cv2.cvtColor(fr, cv2.COLOR_RGB2BGR))
+        vw.release()
+        print(f"rendered {len(render_frames)} frames -> {video_out}")
+        renderer.close()
 
 
 def analyze_episode(frames, fell, t_end):
