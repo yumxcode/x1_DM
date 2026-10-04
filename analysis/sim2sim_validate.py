@@ -350,6 +350,8 @@ def main():
         rmodel = _mj.MjModel.from_xml_path(args.render_xml)
         rdata = _mj.MjData(rmodel)
         renderer = _mj.Renderer(rmodel, height=480, width=854)
+        scn_opt = _mj.MjvOption()
+        scn_opt.geomgroup[2] = True   # X1 mesh visual geoms live in group 2
         cam = _mj.MjvCamera()
         cam.lookat[:] = [0.0, 0.0, 0.7]
         cam.distance = 3.2
@@ -408,7 +410,8 @@ def main():
                 rdata.qpos[:] = sim.data.qpos
                 rdata.qvel[:] = sim.data.qvel
                 _mj.mj_forward(rmodel, rdata)
-                renderer.update_scene(rdata, camera=cam)
+                cam.lookat[:] = sim.data.qpos[:3]  # track the robot
+                renderer.update_scene(rdata, camera=cam, scene_option=scn_opt)
                 render_frames.append(renderer.render())
         results.append(analyze_episode(frames, done, t))
         print(f"episode {ep}: dur={t:.2f}s fell={done} "

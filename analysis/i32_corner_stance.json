@@ -1,0 +1,1 @@
+{"n_stance": 1743, "corner_mean_mm": 1.2193616303818486, "corner_p50_mm": 1.0136041636065758, "verdict": "FLOAT DISPROVED: stance frames' corners are on the ground (center-height was the artifact) - R003 S1.1 must be retracted"}
