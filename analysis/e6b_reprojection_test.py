@@ -301,6 +301,22 @@ def main():
                 zeros_v = np.zeros_like(w["vel"])
                 zeros_d = np.zeros_like(w["dof_vel"])
                 outs.append(disc_obs_from_win(w, zeros_v, zeros_d))
+            elif mode == "grounded":
+                # v3.2 probe: re-ground each frame on x1_train geometry
+                # (root_z -= sole zmin of that frame), velocities recomputed
+                soles = w["soles"]
+                zmin = np.minimum(soles[:, 0, 2], soles[:, 1, 2])
+                shift = zmin  # land each frame
+                pos = w["pos"].copy()
+                pos[:, 2] -= shift
+                vel = np.zeros_like(w["vel"])
+                vel[:-1] = FPS * (pos[1:] - pos[:-1])
+                vel[-1] = vel[-2]
+                # key positions follow root shift (bodies rigid w.r.t. root z)
+                key = w["key"].copy()
+                key[:, :, 2] -= shift[:, None]
+                w2 = dict(w); w2["pos"] = pos; w2["vel"] = vel; w2["key"] = key
+                outs.append(disc_obs_from_win(w2))
             else:
                 outs.append(disc_obs_from_win(w))
         x = torch.cat(outs, 0)
@@ -319,6 +335,11 @@ def main():
     nov = batch_loss_variant(all_wins, "noVel")
     print(f"noVel ablation sds_loss: mean={nov.mean():.4f} (probe)")
 
+    gro = batch_loss_variant(all_wins, "grounded")
+    print(f"GROUNDED sds_loss: mean={gro.mean():.4f} p50={np.median(gro):.4f}")
+    gdrop = (base.mean() - gro.mean()) / base.mean()
+    print(f"loss drop from v3.2 re-grounding: {gdrop*100:.1f}%")
+
     # stance-only subset comparison
     if all_stance.sum() > 5:
         idx = np.nonzero(all_stance)[0]
@@ -335,6 +356,7 @@ def main():
     json.dump(dict(n_windows=len(all_wins), base_mean=float(base.mean()),
                    reproj_mean=float(rep.mean()), drop=float(drop),
                    noVel_mean=float(nov.mean()),
+                   grounded_mean=float(gro.mean()), grounded_drop=float(gdrop),
                    stance_base=float(base[all_stance].mean()) if all_stance.any() else None,
                    stance_reproj=float(rep[all_stance].mean()) if all_stance.any() else None,
                    verdict=verdict),
