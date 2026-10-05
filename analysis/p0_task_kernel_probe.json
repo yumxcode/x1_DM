@@ -1,0 +1,10 @@
+{
+ "A_perfect(f50 vs f50)": 1.0,
+ "B_one_step(f50 vs f51)": 0.9216289520263672,
+ "C_frozen_ref(f80 vs f50, 1s drift)": 0.6318719983100891,
+ "C_frozen_ref(f100 vs f50)": 0.8982497453689575,
+ "C_frozen_ref(f150 vs f50)": 0.7288917899131775,
+ "C_frozen_ref(f200 vs f50)": 0.7360475063323975,
+ "C_frozen_ref(f250 vs f50)": 0.6794639229774475,
+ "B_avg_consecutive_20pairs": 0.913449302315712
+}
