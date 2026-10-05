@@ -1,0 +1,365 @@
+[
+  {
+    "cell": {
+      "pd": 1.0,
+      "lat": 0.0,
+      "fric": 1.0,
+      "eps": 3,
+      "tag": "base"
+    },
+    "episodes": [
+      {
+        "duration_s": 0.93,
+        "fell": true,
+        "distance_m": 0.57,
+        "fwd_vel_mean": 0.75,
+        "fwd_vel_std": 0.267,
+        "duty_L": 0.75,
+        "duty_R": 0.429,
+        "flight_ratio": 0.0,
+        "double_support": 0.179,
+        "penet_L_mm": 10.2,
+        "penet_R_mm": 12.2,
+        "clear_L_cm": 4.3,
+        "clear_R_cm": 10.4,
+        "slip_ratio": 0.11,
+        "attack_angle_p50": 16.8,
+        "n_steps_TDB": 1,
+        "dof_vel_absmax": 4.4,
+        "root_h_min": 0.239,
+        "step_SI": 0.273
+      },
+      {
+        "duration_s": 0.79,
+        "fell": true,
+        "distance_m": 0.47,
+        "fwd_vel_mean": 0.622,
+        "fwd_vel_std": 0.367,
+        "duty_L": 0.917,
+        "duty_R": 0.292,
+        "flight_ratio": 0.0,
+        "double_support": 0.208,
+        "penet_L_mm": 19.5,
+        "penet_R_mm": 4.8,
+        "clear_L_cm": 3.2,
+        "clear_R_cm": 5.7,
+        "slip_ratio": 0.246,
+        "attack_angle_p50": 62.9,
+        "n_steps_TDB": 2,
+        "dof_vel_absmax": 4.0,
+        "root_h_min": 0.237,
+        "step_SI": 0.517
+      },
+      {
+        "duration_s": 0.74,
+        "fell": true,
+        "distance_m": 0.42,
+        "fwd_vel_mean": 0.635,
+        "fwd_vel_std": 0.4,
+        "duty_L": 0.957,
+        "duty_R": 0.174,
+        "flight_ratio": 0.043,
+        "double_support": 0.174,
+        "penet_L_mm": 7.6,
+        "penet_R_mm": 7.8,
+        "clear_L_cm": 2.0,
+        "clear_R_cm": 15.9,
+        "slip_ratio": 0.331,
+        "attack_angle_p50": 46.8,
+        "n_steps_TDB": 1,
+        "dof_vel_absmax": 8.1,
+        "root_h_min": 0.244,
+        "step_SI": 0.692
+      }
+    ]
+  },
+  {
+    "cell": {
+      "pd": 1.0,
+      "lat": 0.0,
+      "fric": 1.0,
+      "eps": 1,
+      "tag": "home",
+      "init": "home"
+    },
+    "episodes": [
+      {
+        "duration_s": 1.87,
+        "fell": true,
+        "distance_m": 1.6,
+        "fwd_vel_mean": 0.906,
+        "fwd_vel_std": 0.527,
+        "duty_L": 0.679,
+        "duty_R": 0.821,
+        "flight_ratio": 0.054,
+        "double_support": 0.554,
+        "penet_L_mm": 10.9,
+        "penet_R_mm": 14.2,
+        "clear_L_cm": 4.2,
+        "clear_R_cm": 5.7,
+        "slip_ratio": 0.469,
+        "attack_angle_p50": 11.0,
+        "n_steps_TDB": 4,
+        "dof_vel_absmax": 3.9,
+        "root_h_min": 0.245,
+        "step_SI": 0.095
+      }
+    ]
+  },
+  {
+    "cell": {
+      "pd": 1.0,
+      "lat": 0.0,
+      "fric": 0.6,
+      "eps": 1,
+      "tag": "fric0.6"
+    },
+    "episodes": [
+      {
+        "duration_s": 0.98,
+        "fell": true,
+        "distance_m": 0.6,
+        "fwd_vel_mean": 0.696,
+        "fwd_vel_std": 0.272,
+        "duty_L": 0.733,
+        "duty_R": 0.4,
+        "flight_ratio": 0.067,
+        "double_support": 0.2,
+        "penet_L_mm": 9.5,
+        "penet_R_mm": 10.0,
+        "clear_L_cm": 2.1,
+        "clear_R_cm": 9.9,
+        "slip_ratio": 0.169,
+        "attack_angle_p50": 16.5,
+        "n_steps_TDB": 3,
+        "dof_vel_absmax": 4.5,
+        "root_h_min": 0.25,
+        "step_SI": 0.294
+      }
+    ]
+  },
+  {
+    "cell": {
+      "pd": 1.0,
+      "lat": 0.0,
+      "fric": 0.8,
+      "eps": 1,
+      "tag": "fric0.8"
+    },
+    "episodes": [
+      {
+        "duration_s": 0.94,
+        "fell": true,
+        "distance_m": 0.54,
+        "fwd_vel_mean": 0.675,
+        "fwd_vel_std": 0.248,
+        "duty_L": 0.759,
+        "duty_R": 0.448,
+        "flight_ratio": 0.034,
+        "double_support": 0.241,
+        "penet_L_mm": 8.2,
+        "penet_R_mm": 14.9,
+        "clear_L_cm": 3.5,
+        "clear_R_cm": 10.1,
+        "slip_ratio": 0.172,
+        "attack_angle_p50": 25.7,
+        "n_steps_TDB": 3,
+        "dof_vel_absmax": 4.4,
+        "root_h_min": 0.234,
+        "step_SI": 0.257
+      }
+    ]
+  },
+  {
+    "cell": {
+      "pd": 1.0,
+      "lat": 0.0,
+      "fric": 1.2,
+      "eps": 1,
+      "tag": "fric1.2"
+    },
+    "episodes": [
+      {
+        "duration_s": 0.93,
+        "fell": true,
+        "distance_m": 0.59,
+        "fwd_vel_mean": 0.768,
+        "fwd_vel_std": 0.277,
+        "duty_L": 0.714,
+        "duty_R": 0.429,
+        "flight_ratio": 0.0,
+        "double_support": 0.143,
+        "penet_L_mm": 11.6,
+        "penet_R_mm": 8.6,
+        "clear_L_cm": 4.6,
+        "clear_R_cm": 10.6,
+        "slip_ratio": 0.12,
+        "attack_angle_p50": 27.8,
+        "n_steps_TDB": 2,
+        "dof_vel_absmax": 4.4,
+        "root_h_min": 0.241,
+        "step_SI": 0.25
+      }
+    ]
+  },
+  {
+    "cell": {
+      "pd": 0.5,
+      "lat": 0.0,
+      "fric": 1.0,
+      "eps": 1,
+      "tag": "pd0.5"
+    },
+    "episodes": [
+      {
+        "duration_s": 0.91,
+        "fell": true,
+        "distance_m": 0.5,
+        "fwd_vel_mean": 0.627,
+        "fwd_vel_std": 0.336,
+        "duty_L": 0.75,
+        "duty_R": 0.393,
+        "flight_ratio": 0.0,
+        "double_support": 0.143,
+        "penet_L_mm": 9.9,
+        "penet_R_mm": 7.7,
+        "clear_L_cm": 3.3,
+        "clear_R_cm": 11.1,
+        "slip_ratio": 0.14,
+        "attack_angle_p50": 64.3,
+        "n_steps_TDB": 1,
+        "dof_vel_absmax": 3.9,
+        "root_h_min": 0.24,
+        "step_SI": 0.312
+      }
+    ]
+  },
+  {
+    "cell": {
+      "pd": 2.0,
+      "lat": 0.0,
+      "fric": 1.0,
+      "eps": 1,
+      "tag": "pd2.0"
+    },
+    "episodes": [
+      {
+        "duration_s": 0.88,
+        "fell": true,
+        "distance_m": 0.5,
+        "fwd_vel_mean": 0.695,
+        "fwd_vel_std": 0.196,
+        "duty_L": 0.704,
+        "duty_R": 0.333,
+        "flight_ratio": 0.0,
+        "double_support": 0.037,
+        "penet_L_mm": 7.4,
+        "penet_R_mm": 10.2,
+        "clear_L_cm": 12.2,
+        "clear_R_cm": 14.8,
+        "slip_ratio": 0.41,
+        "attack_angle_p50": 49.0,
+        "n_steps_TDB": 1,
+        "dof_vel_absmax": 4.6,
+        "root_h_min": 0.239,
+        "step_SI": 0.357
+      }
+    ]
+  },
+  {
+    "cell": {
+      "pd": 1.0,
+      "lat": 8.3,
+      "fric": 1.0,
+      "eps": 1,
+      "tag": "lat8.3"
+    },
+    "episodes": [
+      {
+        "duration_s": 0.93,
+        "fell": true,
+        "distance_m": 0.58,
+        "fwd_vel_mean": 0.76,
+        "fwd_vel_std": 0.277,
+        "duty_L": 0.786,
+        "duty_R": 0.321,
+        "flight_ratio": 0.107,
+        "double_support": 0.214,
+        "penet_L_mm": 8.7,
+        "penet_R_mm": 12.5,
+        "clear_L_cm": 4.9,
+        "clear_R_cm": 11.0,
+        "slip_ratio": 0.144,
+        "attack_angle_p50": 26.6,
+        "n_steps_TDB": 3,
+        "dof_vel_absmax": 4.4,
+        "root_h_min": 0.234,
+        "step_SI": 0.419
+      }
+    ]
+  },
+  {
+    "cell": {
+      "pd": 1.0,
+      "lat": 16.7,
+      "fric": 1.0,
+      "eps": 1,
+      "tag": "lat16.7"
+    },
+    "episodes": [
+      {
+        "duration_s": 0.92,
+        "fell": true,
+        "distance_m": 0.56,
+        "fwd_vel_mean": 0.739,
+        "fwd_vel_std": 0.275,
+        "duty_L": 0.679,
+        "duty_R": 0.393,
+        "flight_ratio": 0.0,
+        "double_support": 0.071,
+        "penet_L_mm": 8.7,
+        "penet_R_mm": 10.7,
+        "clear_L_cm": 7.2,
+        "clear_R_cm": 11.4,
+        "slip_ratio": 0.072,
+        "attack_angle_p50": 62.9,
+        "n_steps_TDB": 1,
+        "dof_vel_absmax": 4.4,
+        "root_h_min": 0.241,
+        "step_SI": 0.267
+      }
+    ]
+  },
+  {
+    "cell": {
+      "pd": 1.0,
+      "lat": 41.7,
+      "fric": 1.0,
+      "eps": 1,
+      "tag": "lat41.7"
+    },
+    "episodes": [
+      {
+        "duration_s": 0.94,
+        "fell": true,
+        "distance_m": 0.62,
+        "fwd_vel_mean": 0.769,
+        "fwd_vel_std": 0.331,
+        "duty_L": 0.724,
+        "duty_R": 0.345,
+        "flight_ratio": 0.069,
+        "double_support": 0.138,
+        "penet_L_mm": 9.4,
+        "penet_R_mm": 7.6,
+        "clear_L_cm": 15.9,
+        "clear_R_cm": 11.1,
+        "slip_ratio": 0.128,
+        "attack_angle_p50": 48.0,
+        "n_steps_TDB": 1,
+        "dof_vel_absmax": 4.4,
+        "root_h_min": 0.241,
+        "step_SI": 0.355
+      }
+    ]
+  }
+]
