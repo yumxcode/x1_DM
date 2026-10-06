@@ -115,7 +115,9 @@ def expmap_to_quat_xyzw(r):
 def rsi_init_state(clip_path=None, frame_idx=None, seed=None):
     """RSI (reference state init) per idear-0006 I21: init from a motion
     frame, matching training's rand_reset. Frame = [pos(3), expmap(3), dof(29)].
-    Returns (root_pos, quat_xyzw, dof)."""
+    Returns (root_pos, quat_xyzw, dof). Also exposes clip metadata via the
+    returned extras dict (n_frames, loop_mode) for phase_obs rollouts
+    (I84: phase = clip(t_ref/motion_len,0,1), CLAMP for loop_mode=0)."""
     import pickle
     if clip_path is None:
         clip_path = os.path.join(os.path.dirname(os.path.dirname(
@@ -130,7 +132,9 @@ def rsi_init_state(clip_path=None, frame_idx=None, seed=None):
     root_pos = fr[0:3].copy()
     quat_xyzw = expmap_to_quat_xyzw(fr[3:6])
     dof = fr[6:35].copy()
-    return root_pos, quat_xyzw, dof
+    extras = dict(n_frames=len(frames), fps=d.get("fps", 30),
+                  loop_mode=d.get("loop_mode", 0), f0=k)
+    return root_pos, quat_xyzw, dof, extras
 
 
 # ---------------- MJCF model wrapper ----------------
@@ -260,7 +264,7 @@ class X1Sim:
             rots[i] = axis_angle_to_quat(self.joint_axes[i], dof[i])
         return rots
 
-    def build_obs(self, obs_norm=None, a_norm=None):
+    def build_obs(self, phase=None):
         p, q, v, w = self.root_state()
         dof = self.qpos2dof()
         dof_vel = self.qvel2dofvel()
@@ -275,8 +279,17 @@ class X1Sim:
         for bid in self.key_body_ids:
             key_rel.append(self.data.xpos[bid] - p)
         parts.append(np.concatenate(key_rel))
+        if phase is not None:
+            # I84: phase_obs (1 dim, compute_phase_obs @ deepmimic_env L585;
+            # num_phase_encoding=0 -> raw phase only). Prepended like
+            # compute_deepmimic_obs: [char_obs..., phase_obs]? NO - the
+            # training concat order is obs=[char_obs] + [phase] -> phase is
+            # APPENDED after char_obs (torch.cat(obs, dim=-1) with
+            # obs=[char_obs, phase_obs]).
+            parts.append(np.array([phase], dtype=np.float32))
         obs = np.concatenate(parts).astype(np.float32)
-        assert obs.shape == (228,), obs.shape
+        expect = 229 if phase is not None else 228
+        assert obs.shape == (expect,), obs.shape
         return obs
 
     def apply_action(self, target_dof):
@@ -370,16 +383,34 @@ def main():
     from collections import deque
     pipe = deque(maxlen=n_delay + 1) if n_delay > 0 else None
 
+    # I84: policy obs dim detected from checkpoint normalizer -> drives the
+    # phase channel (229-dim phase_obs models need a reference-time phase:
+    # clip(t_ref/motion_len, 0, 1) per CLAMP loop semantics; 228-dim models
+    # stay legacy-compatible with phase=None).
+    probe_sd = torch.load(args.policy, map_location="cpu", weights_only=False)
+    obs_dim = int(probe_sd["_obs_norm._mean"].shape[0])
+    use_phase = (obs_dim == 229)
+    if use_phase:
+        print("[sim2sim] 229-dim policy detected -> phase channel ON "
+              "(I84: phase=clip(t_ref/len,0,1))", flush=True)
+    del probe_sd
+
     results = []
     render_frames = []
     for ep in range(args.episodes):
+        rsi_meta = None
         if args.init == "rsi":
-            rp, rq, qd = rsi_init_state(args.init_clip, args.init_frame,
-                                         seed=ep if args.init_frame is None else None)
+            rp, rq, qd, rsi_meta = rsi_init_state(
+                args.init_clip, args.init_frame,
+                seed=ep if args.init_frame is None else None)
             sim.reset(qpos_dof=qd, root_pos=rp, root_quat_xyzw=rq)
         else:
             sim.reset()  # home pose control arm (quantifies transient pollution)
-        obs = sim.build_obs()
+        phase = None
+        if use_phase and rsi_meta is not None:
+            phase = 0.0
+            rsi_meta["t_ref"] = 0.0
+        obs = sim.build_obs(phase=phase)
         frames = []
         t = 0.0
         done = False
@@ -397,7 +428,14 @@ def main():
                 if sim.data.qpos[2] < 0.25:
                     done = True
                     break
-            obs = sim.build_obs()
+            if use_phase and rsi_meta is not None:
+                rsi_meta["t_ref"] += dt_ctrl
+                mlen = (rsi_meta["n_frames"] - 1) / rsi_meta["fps"]
+                if rsi_meta["loop_mode"] == 1:  # WRAP
+                    phase = (rsi_meta["t_ref"] / mlen) % 1.0
+                else:  # CLAMP (x1 data)
+                    phase = min(rsi_meta["t_ref"] / mlen, 1.0)
+            obs = sim.build_obs(phase=phase if use_phase else None)
             zmin = sim.sole_zmin()
             centers = sim.sole_center()
             frames.append(dict(t=t, root=sim.data.qpos[:3].copy(),

@@ -36,7 +36,7 @@ def main():
 
     results = []
     for ep in range(args.episodes):
-        rp, rq, qd = rsi_init_state(args.clip, seed=ep)
+        rp, rq, qd, _meta = rsi_init_state(args.clip, seed=ep)
         # ALSO load the reference frames for pose_fail mimic
         with open(args.clip or os.path.join(os.path.dirname(os.path.dirname(
                 os.path.abspath(__file__))), "x1_retargeted_motion",
