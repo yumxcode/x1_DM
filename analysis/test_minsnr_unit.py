@@ -47,11 +47,15 @@ assert torch.allclose(weighted, (manual * elem).mean()), "T2"
 # T3 normalization
 assert abs(float(w_norm.mean()) - 1.0) < 1e-9, "T3"
 
-# T4 clamping at high t
+# T4 clamping direction (I91 fix, idear-0026 §A): LOW-t steps (SNR > gamma)
+# clamp to gamma; HIGH-t keep their tiny SNR. Hard assertions - the old
+# version had a vacuous second disjunct (clamp => max<=gamma always true)
+# and inverted attribution in the report text.
+lo = timesteps <= 10
+assert bool((w[lo] == GAMMA).all()), "T4a: low-t weights must clamp at gamma"
 hi = timesteps >= 45
-assert bool((w[hi] == GAMMA).all() or float(w[hi].max()) <= GAMMA + 1e-12), "T4"
-lo = timesteps <= 5
-assert float(w[lo].min()) > GAMMA * 0.9 or True  # low-t: unclamped (SNR large)
+assert bool((w[hi] < GAMMA * 0.01).all()), "T4b: high-t weights stay tiny SNR (<1% gamma)"
+assert float((w == GAMMA).float().mean()) > 0.2, "T4c: a nontrivial clamped fraction exists"
 
 # T5 v_prediction target
 sched_v = DDPMScheduler(num_train_timesteps=T, beta_schedule="squaredcos_cap_v2",
