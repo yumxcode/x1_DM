@@ -5,8 +5,8 @@
 #       19-34 exhausted (1002056); 35 funded (batch 6, I87: log batch size)
 set -euo pipefail
 REPO=/Users/yumx/code/x1_DM
-KEY=$(awk -F' ' '$1=="38"{print $2}' "$REPO/.repos/keys.txt")
-[ -z "$KEY" ] && { echo "no key for account 38 in .repos/keys.txt" >&2; exit 1; }
+KEY=$(awk -F' ' '$1=="37"{print $2}' "$REPO/.repos/keys.txt")
+[ -z "$KEY" ] && { echo "no key for account 37 in .repos/keys.txt" >&2; exit 1; }
 export HOME="$REPO/.gmhome"
 export GM_API_KEY="$KEY"
 exec gm "$@"
